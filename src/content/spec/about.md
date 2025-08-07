@@ -1,9 +1,12 @@
 # About
-This is the demo site for [Fuwari](https://github.com/saicaca/fuwari).
 
-::github{repo="saicaca/fuwari"}
+武汉大学 大三 软件工程
 
-> ### Sources of images used in this site
-> - [Unsplash](https://unsplash.com/)
-> - [星と少女](https://www.pixiv.net/artworks/108916539) by [Stella](https://www.pixiv.net/users/93273965)
-> - [Rabbit - v1.4 Showcase](https://civitai.com/posts/586908) by [Rabbit_YourMajesty](https://civitai.com/user/Rabbit_YourMajesty)
+博客源码。
+
+::github{repo="eachic/website"}
+
+> ### 感兴趣方向
+> - LLM 大语言模型
+> - 计算机图形学,计算机视觉应用
+> - 各类新型技术
