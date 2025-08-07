@@ -3,7 +3,7 @@ title: tinyrenderer 学习笔记（一）
 published: 2025-07-01
 tags: [CG,Learning]
 category: Tinyrenderer
-draft: true
+draft: false
 ---
 # tinyrenderer 学习笔记（一）
 
