@@ -8,12 +8,13 @@ interface Props {
 	alt?: string;
 	position?: string;
 	basePath?: string;
+	seed?: string; // 新增：用于随机图片的种子
 }
 
 import { Image } from "astro:assets";
 import { url } from "../../utils/url-utils";
 
-const { id, src, alt, position = "center", basePath = "/" } = Astro.props;
+const { id, src, alt, position = "center", basePath = "/", seed } = Astro.props;
 const className = Astro.props.class;
 
 const isLocal = !(
@@ -23,6 +24,10 @@ const isLocal = !(
 	src.startsWith("data:")
 );
 const isPublic = src.startsWith("/");
+
+// 检测是否是随机图API
+const isRandomImageApi =
+	src.includes("api.miaomc.cn/image/get") || src.includes("t.alcy.cc/moez");
 
 // TODO temporary workaround for images dynamic import
 // https://github.com/withastro/astro/issues/3373
@@ -50,5 +55,113 @@ const imageStyle = `object-position: ${position}`;
 <div id={id} class:list={[className, 'overflow-hidden relative']}>
     <div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"></div>
     {isLocal && img && <Image src={img} alt={alt || ""} class={imageClass} style={imageStyle}/>}
-    {!isLocal && <img src={isPublic ? url(src) : src} alt={alt || ""} class={imageClass} style={imageStyle}/>}
+    {!isLocal && !isRandomImageApi && <img src={isPublic ? url(src) : src} alt={alt || ""} class={imageClass} style={imageStyle}/>}
+    {!isLocal && isRandomImageApi && (
+        <img 
+            data-random-src={src} 
+            data-seed={seed || id || 'default'} 
+            alt={alt || ""} 
+            class={`${imageClass} random-image opacity-0 transition-opacity duration-300`} 
+            style={imageStyle}
+        />
+    )}
 </div>
+
+{isRandomImageApi && (
+    <script>
+        // 客户端脚本：处理随机图片加载
+        document.addEventListener('DOMContentLoaded', () => {
+            const randomImages = document.querySelectorAll('img.random-image');
+            
+            randomImages.forEach((imgElement) => {
+                const img = imgElement as HTMLImageElement;
+                const baseSrc = img.getAttribute('data-random-src');
+                const seed = img.getAttribute('data-seed') || 'default';
+                
+                if (baseSrc) {
+                    // 创建一个基于种子的简单哈希
+                    let hash = 0;
+                    for (let i = 0; i < seed.length; i++) {
+                        const char = seed.charCodeAt(i);
+                        hash = ((hash << 5) - hash) + char;
+                        hash = hash & hash; // 转换为32位整数
+                    }
+                    // 确保是正数
+                    hash = Math.abs(hash);
+                    
+                    // 根据不同的API添加不同的参数
+                    let finalSrc;
+                    if (baseSrc.includes('api.miaomc.cn/image/get')) {
+                        finalSrc = `${baseSrc}?t=${Date.now()}&seed=${hash}`;
+                    } else if (baseSrc.includes('picsum.photos')) {
+                        finalSrc = `${baseSrc}?random=${hash}`;
+                    } else if (baseSrc.includes('source.unsplash.com')) {
+                        finalSrc = `${baseSrc}?sig=${hash}`;
+                    } else {
+                        // 通用处理
+                        finalSrc = `${baseSrc}?t=${Date.now()}&seed=${hash}`;
+                    }
+                    
+                    // 预加载图片
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
+                        img.src = finalSrc;
+                        img.classList.remove('opacity-0');
+                    };
+                    tempImg.onerror = () => {
+                        // 如果随机图片加载失败，使用原始URL
+                        img.src = baseSrc;
+                        img.classList.remove('opacity-0');
+                    };
+                    tempImg.src = finalSrc;
+                }
+            });
+        });
+        
+        // 处理页面切换时的图片加载（针对Swup）
+        if (window.swup) {
+            window.swup.hooks.on('content:replace', () => {
+                const randomImages = document.querySelectorAll('img.random-image');
+                
+                randomImages.forEach((imgElement) => {
+                    const img = imgElement as HTMLImageElement;
+                    const baseSrc = img.getAttribute('data-random-src');
+                    const seed = img.getAttribute('data-seed') || 'default';
+                    
+                    if (baseSrc && !img.src.startsWith('http')) {
+                        // 创建基于种子的哈希
+                        let hash = 0;
+                        for (let i = 0; i < seed.length; i++) {
+                            const char = seed.charCodeAt(i);
+                            hash = ((hash << 5) - hash) + char;
+                            hash = hash & hash;
+                        }
+                        hash = Math.abs(hash);
+                        
+                        let finalSrc;
+                        if (baseSrc.includes('api.miaomc.cn/image/get')) {
+                            finalSrc = `${baseSrc}?t=${Date.now()}&seed=${hash}`;
+                        } else if (baseSrc.includes('picsum.photos')) {
+                            finalSrc = `${baseSrc}?random=${hash}`;
+                        } else if (baseSrc.includes('source.unsplash.com')) {
+                            finalSrc = `${baseSrc}?sig=${hash}`;
+                        } else {
+                            finalSrc = `${baseSrc}?t=${Date.now()}&seed=${hash}`;
+                        }
+                        
+                        const tempImg = new Image();
+                        tempImg.onload = () => {
+                            img.src = finalSrc;
+                            img.classList.remove('opacity-0');
+                        };
+                        tempImg.onerror = () => {
+                            img.src = baseSrc;
+                            img.classList.remove('opacity-0');
+                        };
+                        tempImg.src = finalSrc;
+                    }
+                });
+            });
+        }
+    </script>
+)}
