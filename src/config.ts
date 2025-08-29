@@ -16,12 +16,12 @@ export const siteConfig: SiteConfig = {
 		fixed: false, // Hide the theme color picker for visitors
 	},
 	banner: {
-		enable: false,
-		src: "assets/images/demo-banner.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+		enable: true,
+		src: "https://origin.picgo.net/2025/08/29/pink_haire30ed00ef91586df.jpeg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
 		position: "center", // Equivalent to object-position, only supports 'top', 'center', 'bottom'. 'center' by default
 		credit: {
 			enable: false, // Display the credit text of the banner image
-			text: "", // Credit text to be displayed
+			text: "What is mind? No matter. What is matter? Never mind", // Credit text to be displayed
 			url: "", // (Optional) URL link to the original artwork or artist's page
 		},
 	},
@@ -47,6 +47,8 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Home,
 		LinkPreset.Archive,
 		LinkPreset.About,
+		LinkPreset.Anime,
+		LinkPreset.Friends,
 		{
 			name: "GitHub",
 			url: "https://github.com/Eachic", // Internal links should not include the base path, as it is automatically added
