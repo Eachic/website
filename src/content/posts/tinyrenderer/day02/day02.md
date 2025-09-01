@@ -38,11 +38,11 @@ bool inTriangle(float i, float j, int ax, int ay, int bx, int by, int cx, int cy
     int tmp1 = dicardProject(i - ax, j - ay, bx - ax, by - ay);
     int tmp2 = dicardProject(i - bx, j - by, cx - bx, cy - by);
     int tmp3 = dicardProject(i - cx, j - cy, ax - cx, ay - cy);
-    return ((tmp1 | tmp2) >= 0) && ((tmp1 | tmp3) >= 0);
+    return ((tmp1 ^ tmp2) >= 0) && ((tmp1 ^ tmp3) >= 0);
 }
 ```
 
-注意这里的小技巧，判断两个数是否同号可以用$(x|y) >= 0$ 来判断。
+注意这里的小技巧，判断两个数是否同号可以用$(x^y) >= 0$ 来判断。
 
 最终效果如下：
 
