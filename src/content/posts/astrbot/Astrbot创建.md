@@ -3,6 +3,7 @@ title: 领养一只属于你的astrbot
 published: 2026-03-24
 tags: [python,ai,bot]
 category: funny
+image: 'https://t.alcy.cc/moez'
 draft: false
 ---
 
