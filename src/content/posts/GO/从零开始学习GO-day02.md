@@ -1,5 +1,5 @@
 ---
-title: 从零开始学习GO-day01
+title: 从零开始学习GO-day02
 published: 2026-02-21
 tags: [learning]
 category: Go开发
